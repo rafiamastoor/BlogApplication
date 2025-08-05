@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Application</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <h2>Login/Register</h2>
+    <form id="loginForm">
+        <input type="text" id="username" placeholder="User Name"><br>
+        <input type="password" id="password" placeholder="Password"><br>
+        <button type="button" id="registerButton" type="submit">Register</button>
+        <button type="submit">Login</button>
+    </form>
+    <script>
+        //login button logic
+        document.getElementById("loginForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const user_name = document.getElementById("username").value;
+            const user_password = document.getElementById("password").value;
+
+            try {
+                const response = await fetch("users/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ user_name, user_password }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                alert("Login successful! 🎉");
+                // Store token if needed
+                localStorage.setItem("token", data.token);
+                localStorage.setItem("username", user_name);
+                localStorage.setItem("userid", data.userid);
+                // Redirect to blog page or dashboard
+                window.location.href = "/dashboard.html";
+                } else {
+                alert("Login failed: " + data.error);
+                }
+            } catch (error) {
+                console.error("Error during login:", error);
+                alert("Something went wrong!");
+            }
+        });
+        // register button logic
+        document.getElementById("registerButton")?.addEventListener("click", async () => {
+            console.log("Register button clicked");
+            const user_name = document.getElementById("username").value;
+            const user_password = document.getElementById("password").value;
+
+            try {
+                const response = await fetch("/users/signup", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ user_name, user_password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                alert("🎉 Registration successful!");
+                } else {
+                alert("❌ Registration failed: " + data.error);
+                }
+            } catch (error) {
+                console.error("Error during registration:", error);
+                alert("Something went wrong!");
+            }
+        });
+    </script>
+</body>
+</html>

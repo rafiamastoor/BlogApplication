@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Blog Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h2>Blog Dashboard</h2>
+    <nav>
+      <a href="createblog.html">Create Blog</a> |
+      <a href="#" id="logout">Logout</a>
+    </nav>
+  </header>
+
+  <section id="blogsContainer">
+    <p>Loading blogs...</p>
+  </section>
+
+  <script>
+    //Get all blogs and display on dashboard
+      window.addEventListener("DOMContentLoaded", async () => {
+        const container = document.getElementById("blogsContainer");
+        const token = localStorage.getItem("token");
+
+        try {
+          const response = await fetch("/blogs", {
+            headers: {
+              "Authorization": `Bearer ${token}`
+            }
+          });
+
+          const blogs = await response.json();
+          container.innerHTML = "";
+
+          if (blogs.length === 0) {
+            container.innerHTML = "<p>No blogs found.</p>";
+            return;
+          }
+
+          blogs.forEach(blog => {
+            const blogCard = document.createElement("div");
+            blogCard.className = "blog-card";
+
+            const author = blog.bloguser?.user_name || "Anonymous";
+            const category = blog.category_name || "Uncategorized";
+
+            blogCard.innerHTML = `
+              <h3>${blog.title}</h3>
+              <p>${blog.content}</p>
+              <p><strong>Author:</strong> ${author}</p>
+              <p><strong>Category:</strong> ${category}</p>
+            `;
+
+            container?.appendChild(blogCard);
+          });
+        } catch (error) {
+          container.innerHTML = "<p>Failed to load blogs.</p>";
+          console.error("Error fetching blogs:", error);
+        }
+    });
+
+    // Logout handler
+    document.getElementById("logout")?.addEventListener("click", () => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("username");
+      localStorage.removeItem("userid");
+      window.location.href = "/index.html";
+    });
+  </script>
+</body>
+</html>

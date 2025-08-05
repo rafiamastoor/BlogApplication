@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Create Blog</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h2>Create Blog</h2>
+    <nav>
+      <a href="dashboard.html">Dashboard</a> |
+      <a href="#" id="logout">Logout</a>
+    </nav>
+  </header>
+  <form id="createBlogForm">
+    <input type="text" id="title" placeholder="Blog Title" required /><br>
+    <textarea id="content" placeholder="Blog Content" rows="25" cols="100" required></textarea><br>
+    <label for="category">Choose a category:</label>
+    <select id="category" name="category" required>
+      <option value="">Select Category</option>
+      <option value="Technology">Technology</option>
+      <option value="Travel">Travel</option>
+      <option value="Food">Food</option>
+      <option value="Lifestyle">Lifestyle</option>
+      <option value="Finance">Finance</option>
+    </select>
+    <br>
+    <button type="submit">Post Blog</button>
+  </form>
+  <script>
+      //post blog button logic
+      document.getElementById("createBlogForm")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const title = document.getElementById("title").value;
+      const content = document.getElementById("content").value;
+      const token = localStorage.getItem("token");
+      const postedBy = localStorage.getItem("userid");
+      const category_name = document.getElementById("category").value;
+      
+      try {
+        console.log('posting blog data');
+        const response = await fetch("/blogs", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+          body: JSON.stringify({ title, content, postedBy, category_name }),
+        });
+
+        const data = await response.json();
+
+        console.log('receiving blog data')
+
+        if (response.ok) {
+          alert("Blog posted! ✅");
+          window.location.href = "dashboard.html";
+        } else {
+          console.log(data)
+          alert(`Error: ${data.error}`);
+        }
+      } catch (error) {
+        console.error("Blog post error:", error);
+        alert("Something went wrong!");
+      }
+    });
+
+    // Logout handler
+    document.getElementById("logout")?.addEventListener("click", () => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("username");
+      localStorage.removeItem("userid");
+      window.location.href = "/index.html";
+    });
+  </script>
+</body>
+</html>
